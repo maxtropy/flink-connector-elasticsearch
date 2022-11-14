@@ -55,6 +55,7 @@ import static org.apache.flink.streaming.connectors.elasticsearch.table.Elastics
 import static org.apache.flink.streaming.connectors.elasticsearch.table.ElasticsearchConnectorOptions.INDEX_OPTION;
 import static org.apache.flink.streaming.connectors.elasticsearch.table.ElasticsearchConnectorOptions.KEY_DELIMITER_OPTION;
 import static org.apache.flink.streaming.connectors.elasticsearch.table.ElasticsearchConnectorOptions.PASSWORD_OPTION;
+import static org.apache.flink.streaming.connectors.elasticsearch.table.ElasticsearchConnectorOptions.UPDATE_EXCLUDE_FIELD_KEY_OPTION;
 import static org.apache.flink.streaming.connectors.elasticsearch.table.ElasticsearchConnectorOptions.USERNAME_OPTION;
 
 /** A {@link DynamicTableSinkFactory} for discovering {@link Elasticsearch7DynamicSink}. */
@@ -76,7 +77,8 @@ public class Elasticsearch7DynamicSinkFactory implements DynamicTableSinkFactory
                             CONNECTION_PATH_PREFIX,
                             FORMAT_OPTION,
                             PASSWORD_OPTION,
-                            USERNAME_OPTION)
+                            USERNAME_OPTION,
+                            UPDATE_EXCLUDE_FIELD_KEY_OPTION)
                     .collect(Collectors.toSet());
 
     @Override

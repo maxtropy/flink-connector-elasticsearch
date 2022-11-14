@@ -150,6 +150,10 @@ class ElasticsearchConfiguration {
         return config.getOptional(ElasticsearchConnectorOptions.CONNECTION_PATH_PREFIX);
     }
 
+    public Optional<String> getUpdateExcludeFieldKey() {
+        return config.getOptional(ElasticsearchConnectorOptions.UPDATE_EXCLUDE_FIELD_KEY_OPTION);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

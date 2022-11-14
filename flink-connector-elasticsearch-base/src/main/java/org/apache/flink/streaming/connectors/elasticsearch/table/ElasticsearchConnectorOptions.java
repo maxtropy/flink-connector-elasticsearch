@@ -152,6 +152,14 @@ public class ElasticsearchConnectorOptions {
                             "The format must produce a valid JSON document. "
                                     + "Please refer to the documentation on formats for more details.");
 
+    public static final ConfigOption<String> UPDATE_EXCLUDE_FIELD_KEY_OPTION =
+            ConfigOptions.key("update-exclude-field-key")
+                    .stringType()
+                    .noDefaultValue()
+                    .withDescription(
+                            "The key to ignore when updating. "
+                                    + "A comma-separated list of string.");
+
     // --------------------------------------------------------------------------------------------
     // Enums
     // --------------------------------------------------------------------------------------------

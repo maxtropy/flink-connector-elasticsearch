@@ -24,9 +24,11 @@ import org.apache.flink.api.common.serialization.RuntimeContextInitializationCon
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkFunction;
 import org.apache.flink.streaming.connectors.elasticsearch.RequestIndexer;
+import org.apache.flink.streaming.connectors.elasticsearch.util.JsonFilterUtils;
 import org.apache.flink.table.api.TableException;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.util.Preconditions;
+import org.apache.flink.util.StringUtils;
 
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -47,6 +49,7 @@ class RowElasticsearchSinkFunction implements ElasticsearchSinkFunction<RowData>
 
     private final IndexGenerator indexGenerator;
     private final String docType;
+    private String updateExcludeFieldKey;
     private final SerializationSchema<RowData> serializationSchema;
     private final XContentType contentType;
     private final RequestFactory requestFactory;
@@ -61,6 +64,23 @@ class RowElasticsearchSinkFunction implements ElasticsearchSinkFunction<RowData>
             Function<RowData, String> createKey) {
         this.indexGenerator = Preconditions.checkNotNull(indexGenerator);
         this.docType = docType;
+        this.serializationSchema = Preconditions.checkNotNull(serializationSchema);
+        this.contentType = Preconditions.checkNotNull(contentType);
+        this.requestFactory = Preconditions.checkNotNull(requestFactory);
+        this.createKey = Preconditions.checkNotNull(createKey);
+    }
+
+    public RowElasticsearchSinkFunction(
+            IndexGenerator indexGenerator,
+            @Nullable String docType, // this is deprecated in es 7+
+            SerializationSchema<RowData> serializationSchema,
+            XContentType contentType,
+            RequestFactory requestFactory,
+            Function<RowData, String> createKey,
+            String updateExcludeFieldKey) {
+        this.indexGenerator = Preconditions.checkNotNull(indexGenerator);
+        this.docType = docType;
+        this.updateExcludeFieldKey = updateExcludeFieldKey;
         this.serializationSchema = Preconditions.checkNotNull(serializationSchema);
         this.contentType = Preconditions.checkNotNull(contentType);
         this.requestFactory = Preconditions.checkNotNull(requestFactory);
@@ -91,13 +111,18 @@ class RowElasticsearchSinkFunction implements ElasticsearchSinkFunction<RowData>
     }
 
     private void processUpsert(RowData row, RequestIndexer indexer) {
-        final byte[] document = serializationSchema.serialize(row);
+        byte[] document = serializationSchema.serialize(row);
         final String key = createKey.apply(row);
         if (key != null) {
-            final UpdateRequest updateRequest =
-                    requestFactory.createUpdateRequest(
-                            indexGenerator.generate(row), docType, key, contentType, document);
-            indexer.add(updateRequest);
+            if (!StringUtils.isNullOrWhitespaceOnly(updateExcludeFieldKey)) {
+                document = JsonFilterUtils.excludeJsonField(document, updateExcludeFieldKey);
+            }
+            if (document != null) {
+                final UpdateRequest updateRequest =
+                        requestFactory.createUpdateRequest(
+                                indexGenerator.generate(row), docType, key, contentType, document);
+                indexer.add(updateRequest);
+            }
         } else {
             final IndexRequest indexRequest =
                     requestFactory.createIndexRequest(

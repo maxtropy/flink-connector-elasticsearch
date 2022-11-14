@@ -127,6 +127,7 @@ public class Elasticsearch7DynamicSinkITCase extends TestLogger {
                                                                 .FLUSH_ON_CHECKPOINT_OPTION
                                                                 .key(),
                                                         "false")
+                                                .withOption("update-exclude-field-key", "abc")
                                                 .build())
                                 .getSinkRuntimeProvider(new MockContext());
 

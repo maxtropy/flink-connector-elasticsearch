@@ -26,7 +26,7 @@ under the License.
 	<parent>
 		<groupId>org.apache.flink</groupId>
 		<artifactId>flink-connector-elasticsearch-parent</artifactId>
-		<version>3.0.0</version>
+		<version>m.3.0.0</version>
 	</parent>
 
 	<artifactId>flink-connector-elasticsearch-base</artifactId>
@@ -40,6 +40,19 @@ under the License.
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
 
 		<!-- Core -->
 
